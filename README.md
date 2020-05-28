@@ -1,7 +1,7 @@
 afe
 ===
 
-afe is a very simple PSF font editor written in Python. It requires wxPython.
+afe is a very simple PSF font editor written in Python (For python 3.7). It requires wxPython(`pip install wxPython`).
 
 In a font window:
 
@@ -10,3 +10,6 @@ In a font window:
 * The right button swaps the focused char with the edited one.
 
 The rest is easy.
+
+## Getting fonts
+PSF fonts can be found in https://github.com/fcambus/spleen
