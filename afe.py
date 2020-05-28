@@ -11,24 +11,26 @@ font_dict = {}
 
 WILDCARD = "PSF files (*.psf;*.psf.gz;*.psfu;*.psfu.gz)|*.psf;*.psf.gz;*.psfu;*.psfu.gz|All files|*"
 
-font_directory = '../../spleen-1.7.0/'
+font_directory = '.\\'
 
 class ResizeDialog(wx.Dialog):
     def __init__(self, parent, y, x):
         wx.Dialog.__init__(self, parent, -1, title = "Resize", style = wx.DEFAULT_DIALOG_STYLE)
         labelWidth = wx.StaticText(self, -1, "Width")
         labelHeight = wx.StaticText(self, -1, "Height")
-        self.spinWidth = wx.SpinCtrl(self, -1, value="width", min = 4, max = 32, initial = x)
-        self.spinHeight = wx.SpinCtrl(self, -1, value="height", min = 6, max = 32, initial = y)
+        self.spinWidth = wx.SpinCtrl(self, -1, value="8", min = 4, max = 32, initial = x, size=wx.Size(64, 20))
+        self.spinHeight = wx.SpinCtrl(self, -1, value="16", min = 6, max = 32, initial = y, size=wx.Size(64, 20))
         okButton = wx.Button(self, wx.ID_OK)
         cancelButton = wx.Button(self, wx.ID_CANCEL)
-        grid = wx.GridSizer(3, 2)
+        grid = wx.GridSizer(4, 2, 20)
         grid.Add(labelWidth)
         grid.Add(self.spinWidth)
         grid.Add(labelHeight)
         grid.Add(self.spinHeight)
+        grid.AddSpacer(1)
         grid.Add(okButton)
         grid.Add(cancelButton)
+        grid.AddSpacer(1)
         self.SetSizer(grid)
         grid.Fit(self)
         self.Fit()
@@ -133,7 +135,7 @@ class Editor(wx.Frame):
     def save_char(self, event):
         global font_dict
 
-        if font_dict.has_key(self.font_id):
+        if self.font_id in font_dict:
             f = font_dict[self.font_id]
             f.set_char(self.char_id)
 
@@ -204,6 +206,7 @@ class Font(wx.Frame):
            self.SetTitle('AFE ' + self.filename)
            self.directory = ''
         else:
+           self.filename = "new_font.psf"
            self.directory = font_directory
         self.psf = PSF(filename)
         self.button = []
@@ -289,7 +292,7 @@ class Font(wx.Frame):
         global font_directory
 
         dlg = wx.FileDialog(self, message="Name the file", defaultDir=self.directory, defaultFile=self.filename, wildcard=WILDCARD,
-        style=wx.SAVE | wx.CHANGE_DIR)
+        style=wx.FD_SAVE | wx.FD_CHANGE_DIR)
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetFilename()
             font_directory = self.directory = dlg.GetDirectory()
@@ -330,10 +333,10 @@ class PSF:
             self.width = editor.width
             self.charsize = self.height * ((self.width + 7) // 8)
 
-            self.unicode_data = ""
+            self.unicode_data = b''
             self.length = 512
             self.data = array.array('B', [0] * self.length * self.charsize)
-            self.rest = ""
+            self.rest = b''
             self.header2 = array.array('B', [0] * 28)
             self.create_header2()
         else:
@@ -425,6 +428,7 @@ class PSF:
         f.close()
 
     def save(self, filename):
+        print("name:" + filename)
         if filename.endswith(".gz"):
             f = gzip.open(filename, "wb")
         else:
